@@ -1,8 +1,10 @@
 require('./config/config');
 
 const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
 const app = express();
-const bodyParser = require('body-parser')
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -10,33 +12,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.get('/usuario', function(req, res) {
-    res.json('get usuario');
-});
-app.post('/usuario', function(req, res) {
+app.use(require("./routes/usuario"));
 
-    let body = req.body;
+mongoose.connect(process.env.URLDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+}, (err, res) => {
 
-    if (body.nombre === undefined) {
+    if (err) throw new Error('Conexion a base de datos fallida');
 
-        res.status(400).json({
-            ok: false,
-            mensaje: 'el usuario es necesario'
-        });
-    } else {
-        res.json({
-            persona: body
-        });
-    }
-});
-app.put('/usuario/:id', function(req, res) {
-    let id = req.params.id;
-    res.json({
-        id
-    });
-});
-app.delete('/usuario', function(req, res) {
-    res.json('delete usuario');
+    console.log('Conexión a base de datos exitosa');
 });
 
 app.listen(process.env.PORT, () => {
